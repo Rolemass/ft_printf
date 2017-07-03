@@ -12,7 +12,31 @@
 
 #include "ft_printf.h"
 
-static uint32_t	get_precision(t_arg_info flags, char **fmt, int spe)
+static char	*get_qualifier(t_arg_info flags, char *fmt)
+{
+	if (flags->qualifier != 0)
+		return (fmt + 1);
+	if (*fmt == 'h')
+	{
+		if (*(fmt + 1) == 'h')
+		{
+			flags->qualifier = 'H';
+			return (fmt + 2);
+		}
+	}
+	if (*fmt == 'l')
+	{
+		if (*(fmt + 1) == 'l')
+		{
+			flags->qualifier = 'L';
+			return (fmt + 2);
+		}
+	}
+	flags->qualifier = *fmt;
+	return (fmt + 1);
+}
+
+static char	*get_precision(t_arg_info flags, char **fmt, int spe)
 {
 	int nb;
 
@@ -25,32 +49,33 @@ static uint32_t	get_precision(t_arg_info flags, char **fmt, int spe)
 }
 
 
-static uint32_t	get_padding(t_arg_info flags, char *fmt)
+static char	*get_padding(t_arg_info flags, char *fmt)
 {
-	while (*fmt++)
+	while (*fmt)
 	{
-		if (*fmt++ == ZEROPAD)
+		if (*fmt == ZEROPAD)
 		{
 			padding |= ZEROPAD;
 			get_precision(flags, &fmt, ZEROPAD);
 		}
-		else if (*fmt++ == PLUS)
+		else if (*fmt == PLUS)
 			padding |= PLUS;
-		else if (*fmt++ == SPACE)
+		else if (*fmt == SPACE)
 			padding |= SPACE;
-		else if (*fmt++ == LEFT)
+		else if (*fmt == LEFT)
 			padding |= LEFT;
-		else if (*fmt++ == SPECIAL)
+		else if (*fmt == SPECIAL)
 			padding |= SPECIAL
 		else
 			break;
+		fmt++;
 	}
 	return (fmt);
 }
 
 uint32_t		get_opt(char *fmt, t_arg_info flags)
 {
-	while (*fmt++)
+	while (*fmt)
 	{
 		if (*fmt == '%')
 		{
@@ -68,6 +93,7 @@ uint32_t		get_opt(char *fmt, t_arg_info flags)
 			flags->converter = *fmt;
 			break;
 		}
+		++fmt;
 	}
 	return (fmt);
 }
