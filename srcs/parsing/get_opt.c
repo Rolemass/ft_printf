@@ -6,13 +6,13 @@
 /*   By: rolemass <rolemass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/02 22:50:13 by rolemass          #+#    #+#             */
-/*   Updated: 2017/07/03 01:10:44 by rolemass         ###   ########.fr       */
+/*   Updated: 2017/07/04 01:52:49 by rolemass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_printf.h"
+#include "../includes/ft_printf.h"
 
-static char	*get_qualifier(t_arg_info flags, char *fmt)
+static char	*get_qualifier(t_arg_info *flags, char *fmt)
 {
 	if (flags->qualifier != 0)
 		return (fmt + 1);
@@ -36,36 +36,38 @@ static char	*get_qualifier(t_arg_info flags, char *fmt)
 	return (fmt + 1);
 }
 
-static char	*get_precision(t_arg_info flags, char **fmt, int spe)
+static int	get_precision(t_arg_info *flags, char **fmt, int spe)
 {
 	int nb;
 
+	*((*fmt)++);
 	while (ft_isdigit(**fmt))
 		nb = nb * 10 + (*((*fmt)++) - '0');
 	if (spe == ZEROPAD)
 		flags->field_width = nb;
 	else
 		flags->precision = nb;
+	return (nb);
 }
 
 
-static char	*get_padding(t_arg_info flags, char *fmt)
+static char	*get_padding(t_arg_info *flags, char *fmt)
 {
 	while (*fmt)
 	{
 		if (*fmt == ZEROPAD)
 		{
-			padding |= ZEROPAD;
+			flags->padding |= ZEROPAD;
 			get_precision(flags, &fmt, ZEROPAD);
 		}
 		else if (*fmt == PLUS)
-			padding |= PLUS;
+			flags->padding |= PLUS;
 		else if (*fmt == SPACE)
-			padding |= SPACE;
+			flags->padding |= SPACE;
 		else if (*fmt == LEFT)
-			padding |= LEFT;
+			flags->padding |= LEFT;
 		else if (*fmt == SPECIAL)
-			padding |= SPECIAL
+			flags->padding |= SPECIAL;
 		else
 			break;
 		fmt++;
@@ -73,7 +75,7 @@ static char	*get_padding(t_arg_info flags, char *fmt)
 	return (fmt);
 }
 
-uint32_t		get_opt(char *fmt, t_arg_info flags)
+char		*get_opt(char *fmt, t_arg_info *flags)
 {
 	while (*fmt)
 	{
@@ -84,16 +86,19 @@ uint32_t		get_opt(char *fmt, t_arg_info flags)
 		}
 		if (*fmt == '.')
 			get_precision(flags, &fmt, SPECIAL);
+		if (ft_isdigit(*fmt))
+			get_precision(flats, &fmt, ZEROPAD);
 		else if (ft_strchr(SKIP_PAD, *fmt))
 			fmt = get_padding(flags, fmt);
 		else if (ft_strchr(SKIP_QUAL, *fmt))
 			fmt = get_qualifier(flags, fmt);
-		else if (ft_strchr(SKIP_CONV, *fmt)
+		else if (ft_strchr(SKIP_CONV, *fmt))
 		{
 			flags->converter = *fmt;
 			break;
 		}
-		++fmt;
+		else
+			++fmt;
 	}
 	return (fmt);
 }

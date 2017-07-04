@@ -6,14 +6,14 @@
 /*   By: rolemass <rolemass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/07/01 18:53:26 by rolemass          #+#    #+#             */
-/*   Updated: 2017/07/02 23:37:09 by rolemass         ###   ########.fr       */
+/*   Updated: 2017/07/04 02:52:06 by rolemass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FT_PRINTF_H
 # define FT_PRINTF_H
 
-# include "../libft/..libft.h"
+# include "../libft/libft.h"
 # include <stdarg.h>
 
 # define SKIP_PAD	"+-#0 "
@@ -61,6 +61,7 @@
 
 typedef struct	s_arg_info
 {
+	va_list			args;
 	int				qualifier;
 	int				precision;
 	int				base;
@@ -68,6 +69,9 @@ typedef struct	s_arg_info
 	int				field_width;
 	int				padding;
 	uint32_t		width;
-}				t_arg_info:
+}					t_arg_info;
+
+char				*get_opt(char *fmt, t_arg_info *flags);
+
 
 #endif
